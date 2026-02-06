@@ -1,0 +1,50 @@
+<%- include("partials/header", { title, step: "" }) %>
+
+<div class="card">
+  <div class="h1">Admin｜結果列表</div>
+  <p class="p small">
+    目前共有 <strong><%= records.length %></strong> 筆記錄。
+  </p>
+
+  <div class="actions">
+    <a class="btn btn-primary" href="/admin/export.csv?token=<%= token %>">匯出 CSV（Excel）</a>
+    <a class="btn btn-ghost" href="/">返回首頁</a>
+  </div>
+
+  <div class="hr"></div>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr>
+          <th>時間</th>
+          <th>暱稱</th>
+          <th>班別</th>
+          <th>Email</th>
+          <th>G1(A,B,C)</th>
+          <th>G2(X,Y,Z)</th>
+          <th>Code</th>
+          <th>類型</th>
+          <th>Traits</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% records.slice().reverse().forEach(function(r){ %>
+          <tr>
+            <td class="mono"><%= r.timestampISO %></td>
+            <td><%= r.nickname %></td>
+            <td><%= r.class_group || "" %></td>
+            <td><%= r.email || "" %></td>
+            <td class="mono"><%= r.group1.A %>,<%= r.group1.B %>,<%= r.group1.C %></td>
+            <td class="mono"><%= r.group2.X %>,<%= r.group2.Y %>,<%= r.group2.Z %></td>
+            <td class="mono"><%= r.code %></td>
+            <td><%= r.typeNumber %>「<%= r.typeName %>」</td>
+            <td><%= (r.traits || []).join(" / ") %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include("partials/footer") %>

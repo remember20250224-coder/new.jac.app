@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-HK">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <div>
+        <div class="brand">QUEST Enneagram Quick Test</div>
+        <div class="small">本地版｜Node.js + Express</div>
+      </div>
+      <% if (typeof step !== "undefined" && step) { %>
+        <div class="step"><%= step %></div>
+      <% } %>
+    </div>

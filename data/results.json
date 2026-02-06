@@ -1,0 +1,77 @@
+[
+  {
+    "timestampISO": "2026-02-03T16:39:28.417Z",
+    "nickname": "123",
+    "class_group": "123",
+    "email": "1123@as.com",
+    "consent": true,
+    "group1": {
+      "A": 50,
+      "B": 30,
+      "C": 20
+    },
+    "group2": {
+      "X": 50,
+      "Y": 20,
+      "Z": 30
+    },
+    "code": "AX",
+    "typeNumber": 7,
+    "typeName": "熱心者",
+    "traits": [
+      "生氣勃勃的",
+      "一心多用的",
+      "易衝動的"
+    ]
+  },
+  {
+    "timestampISO": "2026-02-03T16:44:36.154Z",
+    "nickname": "111",
+    "class_group": "as",
+    "email": "aa@aa.com",
+    "consent": true,
+    "group1": {
+      "A": 100,
+      "B": 0,
+      "C": 0
+    },
+    "group2": {
+      "X": 20,
+      "Y": 30,
+      "Z": 50
+    },
+    "code": "AZ",
+    "typeNumber": 3,
+    "typeName": "成功者",
+    "traits": [
+      "適應性強的",
+      "雄心勃勃的",
+      "注意形象的"
+    ]
+  },
+  {
+    "timestampISO": "2026-02-03T17:08:15.139Z",
+    "nickname": "123",
+    "class_group": "",
+    "email": "mm@mm.com",
+    "consent": true,
+    "group1": {
+      "A": 20,
+      "B": 60,
+      "C": 20
+    },
+    "group2": {
+      "X": 0,
+      "Y": 0,
+      "Z": 100
+    },
+    "code": "BZ",
+    "typeNumber": 5,
+    "typeName": "調查者",
+    "traits": [
+      "觀察敏銳的",
+      "有創新精神的",
+      "抽離的"
+    ]
+  }
+]

@@ -1,0 +1,60 @@
+<%- include("partials/header", { title, step }) %>
+
+<div class="card">
+  <div class="h1"><%= groupLabel %>（總分必須 = 100）</div>
+  <p class="p">
+    請在下列三句之間分配 100 分（0–100 整數）。你必須令三項總和剛好等於 100 才可提交。
+  </p>
+
+  <% if (error) { %>
+    <div class="error"><%= error %></div>
+  <% } %>
+
+  <form class="form" method="POST" action="<%= actionUrl %>" data-alloc-form="1">
+    <div class="alloc-grid">
+      <% labels.forEach(function(k){ %>
+        <div class="alloc-item">
+          <div class="alloc-head">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="badge"><%= k %></span>
+              <strong>分數</strong>
+            </div>
+            <input
+              id="score_<%= k %>"
+              name="<%= k %>"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              inputmode="numeric"
+              value="<%= (values && values[k] != null) ? values[k] : 0 %>"
+              required
+            />
+          </div>
+          <div class="hr"></div>
+          <div class="statement"><%= statements[k] %></div>
+        </div>
+      <% }); %>
+    </div>
+
+    <div class="totalbar">
+      <div>
+        <strong>目前總和：</strong>
+        <span class="mono" data-total>—</span>
+      </div>
+      <div class="small" data-hint>⚠️ Total must be 100</div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" type="submit" data-submit>下一步</button>
+      <a class="btn btn-ghost" href="/intake">返回上一步</a>
+    </div>
+  </form>
+</div>
+
+<script>
+  window.ALLOC_LABELS = <%- JSON.stringify(labels) %>;
+</script>
+<script src="/validate-allocation.js"></script>
+
+<%- include("partials/footer") %>

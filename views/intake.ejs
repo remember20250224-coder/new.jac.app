@@ -1,0 +1,42 @@
+<%- include("partials/header", { title, step }) %>
+
+<div class="card">
+  <div class="h1">先填寫基本資料</div>
+  <p class="p">請先輸入資料後才可開始測試。</p>
+
+  <% if (error) { %>
+    <div class="error"><%= error %></div>
+  <% } %>
+
+  <form class="form" method="POST" action="/intake">
+    <div class="row">
+      <label for="nickname">暱稱（必填）</label>
+      <input id="nickname" name="nickname" type="text" required value="<%= values.nickname || "" %>" />
+    </div>
+
+    <div class="row">
+      <label for="class_group">班別 / 組別（可選）</label>
+      <input id="class_group" name="class_group" type="text" value="<%= values.class_group || "" %>" />
+    </div>
+
+    <div class="row">
+      <label for="email">Email（可選）</label>
+      <input id="email" name="email" type="email" value="<%= values.email || "" %>" />
+      <div class="small">（可留空）</div>
+    </div>
+
+    <div class="row">
+      <label>
+        <input name="consent" type="checkbox" <%= values.consent ? "checked" : "" %> />
+        我明白此測試只作自我認識用途，並同意儲存結果作統計。
+      </label>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" type="submit">開始</button>
+      <a class="btn btn-ghost" href="/">返回</a>
+    </div>
+  </form>
+</div>
+
+<%- include("partials/footer") %>

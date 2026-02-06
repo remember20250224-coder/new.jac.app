@@ -7,21 +7,12 @@ require("dotenv").config();
 const app = express();
 
 // ====== Config ======
-// - PORT: deployment platforms will inject this (Fly.io/Render/Railway/etc.)
-// - SESSION_SECRET: set a strong secret in production
-// - ADMIN_TOKEN: simple admin gate (query token) for demo purposes
-// - RESULTS_PATH: optional absolute/relative path for where to save results
-const PORT = Number(process.env.PORT) || 3000;
-const HOST = process.env.HOST || "0.0.0.0";
-const NODE_ENV = process.env.NODE_ENV || "development";
+const PORT = process.env.PORT || 3000;
 const SESSION_SECRET = process.env.SESSION_SECRET || "dev_session_secret_change_me";
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || "changeme";
 
-const DEFAULT_RESULTS_PATH = path.join(__dirname, "data", "results.json");
-const RESULTS_PATH = process.env.RESULTS_PATH
-  ? path.resolve(process.env.RESULTS_PATH)
-  : DEFAULT_RESULTS_PATH;
-const DATA_DIR = path.dirname(RESULTS_PATH);
+const DATA_DIR = path.join(__dirname, "data");
+const RESULTS_PATH = path.join(DATA_DIR, "results.json");
 
 // ====== QUEST content (from provided PDF) ======
 const QUEST = {
@@ -88,16 +79,10 @@ app.use(
     cookie: {
       httpOnly: true,
       sameSite: "lax",
-      // behind HTTPS proxies (most hosts), mark cookie secure in production
-      secure: NODE_ENV === "production",
       maxAge: 1000 * 60 * 60, // 1 hour
     },
   })
 );
-
-// When deployed behind a reverse proxy (common), tell Express to trust it.
-// This is needed so secure cookies work properly.
-app.set("trust proxy", 1);
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -444,13 +429,19 @@ app.get("/admin/export.csv", requireAdminToken, async (req, res) => {
   res.send(csv);
 });
 
+// ====== Init (works for local + Vercel serverless) ======
+const initPromise = ensureResultsFile().catch((err) => {
+  // On serverless, the filesystem may be read-only or non-persistent.
+  // We log the error so you can diagnose, but we don't crash the function.
+  console.error("Init results file failed:", err);
+});
 
-// ====== Start (local dev) ======
+// ====== Start (local dev only) ======
 if (require.main === module) {
-  ensureResultsFile()
+  initPromise
     .then(() => {
-      app.listen(PORT, HOST, () => {
-        console.log(`QUEST app running at http://${HOST}:${PORT}`);
+      app.listen(PORT, () => {
+        console.log(`QUEST app running at http://localhost:${PORT}`);
       });
     })
     .catch((err) => {
@@ -459,7 +450,7 @@ if (require.main === module) {
     });
 }
 
-// Export for serverless platforms (e.g. Vercel)
+// ====== Export for Vercel ======
 module.exports = app;
 
     });

@@ -1,0 +1,47 @@
+<%- include("partials/header", { title, step }) %>
+
+<div class="card">
+  <div class="h1">測試結果</div>
+
+  <% if (saveWarning) { %>
+    <div class="error"><%= saveWarning %></div>
+  <% } %>
+
+  <div class="notice">
+    <div><strong>暱稱：</strong> <%= intake.nickname %></div>
+    <% if (intake.class_group) { %><div><strong>班別/組別：</strong> <%= intake.class_group %></div><% } %>
+    <% if (intake.email) { %><div><strong>Email：</strong> <%= intake.email %></div><% } %>
+  </div>
+
+  <div class="hr"></div>
+
+  <div>
+    <strong>第一組分數：</strong>
+    A=<%= group1.A %>, B=<%= group1.B %>, C=<%= group1.C %>
+    <span class="small">（最高：<strong><%= chosen1 %></strong>；同分則 A > B > C）</span>
+  </div>
+
+  <div style="margin-top:8px;">
+    <strong>第二組分數：</strong>
+    X=<%= group2.X %>, Y=<%= group2.Y %>, Z=<%= group2.Z %>
+    <span class="small">（最高：<strong><%= chosen2 %></strong>；同分則 X > Y > Z）</span>
+  </div>
+
+  <div class="hr"></div>
+
+  <div class="h1" style="font-size:18px; margin-top:0;">QUEST 代碼：<span class="mono"><%= code %></span></div>
+  <p class="p">
+    <strong>九型人格：</strong>
+    <span class="mono"><%= typeNumber %></span> 號「<strong><%= typeName %></strong>」
+  </p>
+  <p class="p">
+    <strong>特質關鍵詞：</strong> <%= traits.join(" / ") %>
+  </p>
+
+  <div class="actions">
+    <a class="btn btn-primary" href="/reset">再做一次</a>
+    <a class="btn btn-ghost" href="/">回到首頁</a>
+  </div>
+</div>
+
+<%- include("partials/footer") %>
