@@ -1,0 +1,8 @@
+# Server
+PORT=3000
+
+# Session (change this)
+SESSION_SECRET=please_change_this_to_a_long_random_string
+
+# Admin protection (use /admin/results?token=YOUR_TOKEN)
+ADMIN_TOKEN=changeme
