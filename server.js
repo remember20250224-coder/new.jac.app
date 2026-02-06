@@ -452,10 +452,3 @@ if (require.main === module) {
 
 // ====== Export for Vercel ======
 module.exports = app;
-
-    });
-  })
-  .catch((err) => {
-    console.error("Failed to init results file:", err);
-    process.exit(1);
-  });
