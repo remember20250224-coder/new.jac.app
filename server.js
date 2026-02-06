@@ -451,4 +451,20 @@ if (require.main === module) {
 }
 
 // ====== Export for Vercel ======
+
+const path = require("path");
+
+// SPA fallback for React Router
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+
 module.exports = app;
+
+    });
+  })
+  .catch((err) => {
+    console.error("Failed to init results file:", err);
+    process.exit(1);
+  });
