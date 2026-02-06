@@ -1,7 +1,7 @@
 const path = require("path");
 const fs = require("fs/promises");
 const express = require("express");
-const session = require("express-session");
+const session = require("cookie-session");
 require("dotenv").config();
 
 const app = express();
@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 3000;
 const SESSION_SECRET = process.env.SESSION_SECRET || "dev_session_secret_change_me";
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || "changeme";
 
-const DATA_DIR = path.join(__dirname, "data");
+const DATA_DIR = process.env.VERCEL ? "/tmp" : path.join(__dirname, "data");
 const RESULTS_PATH = path.join(DATA_DIR, "results.json");
 
 // ====== QUEST content (from provided PDF) ======
@@ -73,14 +73,9 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use(
   session({
-    secret: SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      sameSite: "lax",
-      maxAge: 1000 * 60 * 60, // 1 hour
-    },
+    name: "quest_session",
+    keys: [SESSION_SECRET],
+    maxAge: 1000 * 60 * 60, // 1 hour
   })
 );
 
@@ -407,7 +402,8 @@ app.get("/result", requireIntake, requireGroup1, requireGroup2, async (req, res)
 
 // Optional reset
 app.get("/reset", (req, res) => {
-  req.session.destroy(() => res.redirect("/"));
+  req.session = null;
+  res.redirect("/");
 });
 
 // 6) Admin
@@ -451,20 +447,4 @@ if (require.main === module) {
 }
 
 // ====== Export for Vercel ======
-
-const path = require("path");
-
-// SPA fallback for React Router
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-
 module.exports = app;
-
-    });
-  })
-  .catch((err) => {
-    console.error("Failed to init results file:", err);
-    process.exit(1);
-  });
