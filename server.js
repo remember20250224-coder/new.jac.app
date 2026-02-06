@@ -1,5 +1,5 @@
 const path = require("path");
-const fs = require("fs/promises");
+const mongoose = require("mongoose");
 const express = require("express");
 const session = require("cookie-session");
 require("dotenv").config();
@@ -10,9 +10,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const SESSION_SECRET = process.env.SESSION_SECRET || "dev_session_secret_change_me";
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || "changeme";
-
-const DATA_DIR = process.env.VERCEL ? "/tmp" : path.join(__dirname, "data");
-const RESULTS_PATH = path.join(DATA_DIR, "results.json");
+const MONGODB_URI = process.env.MONGODB_URI;
 
 // ====== QUEST content (from provided PDF) ======
 const QUEST = {
@@ -83,30 +81,37 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 // ====== Helpers ======
-async function ensureResultsFile() {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-  try {
-    await fs.access(RESULTS_PATH);
-  } catch {
-    await fs.writeFile(RESULTS_PATH, "[]", "utf8");
-  }
+// Define MongoDB Schema
+const ResultSchema = new mongoose.Schema({
+  timestampISO: String,
+  nickname: String,
+  class_group: String,
+  email: String,
+  consent: Boolean,
+  group1: { A: Number, B: Number, C: Number },
+  group2: { X: Number, Y: Number, Z: Number },
+  code: String,
+  typeNumber: Number,
+  typeName: String,
+  traits: [String],
+});
+const ResultModel = mongoose.model("Result", ResultSchema);
+
+async function connectDB() {
+  if (mongoose.connection.readyState === 1) return;
+  if (!MONGODB_URI) return console.warn("No MONGODB_URI provided.");
+  await mongoose.connect(MONGODB_URI);
 }
 
 async function readResults() {
-  await ensureResultsFile();
-  const raw = await fs.readFile(RESULTS_PATH, "utf8");
-  try {
-    const data = JSON.parse(raw);
-    return Array.isArray(data) ? data : [];
-  } catch {
-    return [];
-  }
+  await connectDB();
+  // Return plain objects (.lean()) so they behave like the JSON data did
+  return await ResultModel.find().sort({ _id: -1 }).lean();
 }
 
 async function appendResult(record) {
-  const all = await readResults();
-  all.push(record);
-  await fs.writeFile(RESULTS_PATH, JSON.stringify(all, null, 2), "utf8");
+  await connectDB();
+  await ResultModel.create(record);
 }
 
 function requireIntake(req, res, next) {
@@ -374,6 +379,9 @@ app.get("/result", requireIntake, requireGroup1, requireGroup2, async (req, res)
       traits,
     };
 
+    // Log to Vercel Console so you can see it even if file is deleted
+    console.log("QUEST_RESULT:", JSON.stringify(record, null, 2));
+
     try {
       await appendResult(record);
       req.session.savedResult = true;
@@ -426,10 +434,8 @@ app.get("/admin/export.csv", requireAdminToken, async (req, res) => {
 });
 
 // ====== Init (works for local + Vercel serverless) ======
-const initPromise = ensureResultsFile().catch((err) => {
-  // On serverless, the filesystem may be read-only or non-persistent.
-  // We log the error so you can diagnose, but we don't crash the function.
-  console.error("Init results file failed:", err);
+const initPromise = connectDB().catch((err) => {
+  console.error("MongoDB connection failed:", err);
 });
 
 // ====== Start (local dev only) ======
